@@ -3,9 +3,13 @@
 Dalam penugasan pembuatan backend service ini bahasa pemrograman yang digunakan adalah Javascript dan teknologi yang dipakai yaitu Node.js ES Module, Express.js, PostgreSQL, Sequelize ORM, JWT, Bcrypt dan Google Gemini API, yang dirun menggunakan npm. User dapat melihat katalog film, membuat akun, menyimpan watchlist, mencatat film yang sudah ditonton, serta meminta rekomendasi film dengan Google Gemini.
 
 
-Link deployment:
+Link deployment: https://movie-watchlist-starter-lyart.vercel.app/
+Jika menggunakan link deployment, ganti menggunakan `https://movie-watchlist-starter-lyart.vercel.app/api` di backend API setting lalu save & reconnect
 
 ## ERD Model
+
+![ERD Model](https://i.imgur.com/AbQ6tK6.png)
+dbdiagram link: https://dbdiagram.io/d/FilmLog-ERD-6af01207f1d298b5739f0b62
 
 Tabel-tabel yang digunakan adalah movies, users, watchlist, dan watched dengan tipe data dan constraint yang sesuai. 
 
@@ -132,4 +136,4 @@ Password di-hash menggunakan Bcrypt di proses autentikasi registrasi dan login m
 ---
 ## Video Walkthrough
 
-Link: 
+Link: https://drive.google.com/file/d/1PUj5Zn5wwHjhRgu71CG71V12ghKNrU3j/view?usp=sharing
