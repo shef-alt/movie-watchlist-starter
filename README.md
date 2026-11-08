@@ -1,22 +1,34 @@
-# FilmLog — GDGoC Backend Recruitment Task Starter Pack
+# FilmLog — GDGoC Backend Recruitment Task
 
-Selamat datang di repositori penugasan backend **FilmLog (Movie Watchlist & Review Platform)**. Repositori ini menyediakan:
-1. **Initial Seed Database** (`data/movies.json` dan `data/seed.sql`) berisi 20 film kurasi awal dengan atribut lengkap.
-2. **Frontend Companion** (`frontend/`) bertema Letterboxd yang siap pakai untuk menguji endpoint backend Anda secara visual dan interaktif.
+Dalam penugasan pembuatan backend service ini bahasa pemrograman yang digunakan adalah Javascript dan teknologi yang dipakai yaitu Node.js ES Module, Express.js, PostgreSQL, Sequelize ORM, JWT, Bcrypt dan Google Gemini API, yang dirun menggunakan npm. User dapat melihat katalog film, membuat akun, menyimpan watchlist, mencatat film yang sudah ditonton, serta meminta rekomendasi film dengan Google Gemini.
 
----
 
-## 🎯 Objektif Penugasan
-Rancang dan bangun layanan **RESTful API** untuk aplikasi pelacak film (*movie watchlist*) yang mendukung alur autentikasi, kurasi film, pencatatan tontonan dan ulasan, serta integrasi **Google Gemini LLM** untuk rekomendasi film berbasis data lokal.
+Link deployment:
 
-Bebas menggunakan bahasa pemrograman dan framework apa pun (Node.js/Express/NestJS, Go/Gin/Fiber, Python/FastAPI/Django, PHP/Laravel, Java/Spring Boot, dll.) serta database relasional (PostgreSQL, MySQL, SQLite) atau NoSQL.
+## ERD Model
 
----
+Tabel-tabel yang digunakan adalah movies, users, watchlist, dan watched dengan tipe data dan constraint yang sesuai. 
 
-## 📁 Struktur Repositori Starter
+### Relasi tabel:
+* users ke watchlist (1-to-Many), 1 user bisa memiliki banyak watchlist dan tiap watchlist pasti memiliki tepat 1 user
+* users ke watched (1-to-Many), 1 user bisa memiliki banyak watched/reviews dan tiap watched/reviews pasti memiliki tepat 1 user
+* movies ke watchlist (1-to-Many), 1 movie dapat dimasukkan ke dalam banyak watchlist dan tiap watchlist memiliki tepat 1 movie
+* movies ke watched (1-to-Many), 1 movie dapat dimasukkan ke dalam banyak watched/reviews dan tiap watched/reviews memiliki tepat 1 movie
+
+Foreign key menggunakan aksi ON DELETE CASCADE dikarenakan jika induknya (users atau movies) dihapus maka anaknya (watchlist atau watched)juga ikut terhapus
+
+## 📁 Struktur Repositori 
 
 ```text
 movie-watchlist-starter/
+├── backend/
+│   ├── config/
+│   ├   ├── db.js       # Berisi konfigurasi database postgresql
+│   ├── controllers/    # Logika autentikasi, film, watchlist, dan watched
+│   ├── middlewares/    # Middleware verifikasi JWT
+│   ├── models/         # Model Sequelize dan relasi tabel
+│   └── routes/         # Definisi endpoint API
+│   ├── app.js          # Inisialisasi Express, route, dan sinkronisasi Sequelize
 ├── data/
 │   ├── movies.json     # Data 20 film awal (format JSON) untuk database seeder
 │   └── seed.sql        # Skrip SQL INSERT kompatibel dengan PostgreSQL & MySQL
@@ -25,13 +37,46 @@ movie-watchlist-starter/
 │   ├── app.js          # Client logic & API caller
 │   └── README.md       # Panduan menjalankan frontend
 └── README.md           # Panduan penugasan & spesifikasi API
+├── .env.example        # Template konfigurasi environment
+└── package.json        # Dependency dan perintah npm
 ```
 
----
+## Prerequisites
+- Node.js v18+
+- PostgreSQL terpasang dan berjalan
+- npm
+
+## Cara install dan run program (jalankan server)
+
+```bash
+npm install
+npm start
+```
+
+## Environment variables
+
+Daftar environment variable yang dibutuhkan adalah: 
+PostgreSQL database config
+DATABASE_URL=postgresql://username:password@hostname:port/db_name
+
+Express.js port
+PORT=8000
+
+JWT secret key
+JWT_SECRET=secret_key
+
+Google Gemini API key
+GEMINI_API_KEY=gemini_api_key   
+
+yang dapat dilihat di .env.example dengan mengcopy lalu rename menjadi .env kemudian mengisi variables yang dibutuhkan
+
+## Cara migrasi dan seed database
+
+Buat database di PostgreSQL dengan query CREATE DATABASE db-name. Nyalakan database server postgre dan konfigurasi connection di .env. Setelah terkoneksi dan menjalankan server backend, maka secara otomatis Sequelize akan membuatkan struktur tabel beserta constraintnya dengan sequelize.sync(). Setelah itu seed database movies bisa dilakukan dengan mengcopy paste query di data/seed.sql dan menjalankan query nya di database yang sama.
 
 ## 📑 Spesifikasi Kontrak API (API Contract)
 
-Agar sistem dapat terhubung secara lancar dengan frontend companion yang disediakan, pastikan API Anda mematuhi spesifikasi antarmuka (API Contract) berikut:
+API sudah mengimplementasikan spesifikasi antarmuka berikut:
 
 ### 1. Autentikasi
 * `POST /api/auth/register`
@@ -76,10 +121,15 @@ Agar sistem dapat terhubung secara lancar dengan frontend companion yang disedia
     }
     ```
 
----
+## Contoh Alur Request/Response
+* `POST /api/movies/recommend`
+  Client/frontend meminta request dengan api /api/movies/recommend dengan method post -> Server/backend menerima request dan mengirimkannya ke GOogle Gemini API dengan menggunakan data prompt dan list film yang akan mengembalikan is_movie_request, movie_id, reasoning dan dilakukan pengecekan untuk movie yang sesuai dengan movie_id sehingga response dapat dikirim dengan data movie_id, reasoning, dan movie. -> Frontend menerima response data tersebut dan menampilkan atau merendernya di UI web. 
 
-## 💡 Prinsip Backend yang Dinilai
-1. **Database Modeling:** Relasi yang rapi antar tabel (`users`, `movies`, `watchlists`, `reviews`).
-2. **Access Control & Security:** Password di-hash (bcrypt/argon2), rute privat terlindungi token JWT, user tidak dapat memodifikasi data user lain.
-3. **Data Integrity & Robustness:** Validasi input request, penanganan error yang baik, dan penggunaan status code HTTP yang semantik.
-4. **Structured LLM Prompting:** Kemampuan mengarahkan Gemini untuk memilih dari subset data lokal dan mengembalikan JSON terstruktur.
+## Access Control & Security
+
+Password di-hash menggunakan Bcrypt di proses autentikasi registrasi dan login menggunakan salt round 10, rute privat terlindungi token JWT yang diterapkan di watchlistRoute dan watchedRoute, dan user tidak dapat memodifikasi data user lain dengan query WHERE user_id = req.user.id dari token.
+
+---
+## Video Walkthrough
+
+Link: 
