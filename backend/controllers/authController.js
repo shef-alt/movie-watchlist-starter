@@ -35,9 +35,8 @@ export const login = async (req, res) => {
         .json({ message: "Email dan password wajib diisi" });
     }
 
-    const data = await User.findAll({ where: { email: email } });
+    const user = await User.findOne({ where: { email: email } });
 
-    const user = data[0];
     const isValid =
       user && (await bcrypt.compare(password, user.password_hash));
 
