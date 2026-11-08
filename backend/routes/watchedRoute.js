@@ -1,4 +1,4 @@
-import { getWatched, markAsWatched } from "../controllers/WatchedController.js";
+import { getWatched, markAsWatched } from "../controllers/watchedController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 import express from "express";
 
