@@ -2,7 +2,8 @@ import Watchlist from "../models/watchlistModel.js";
 
 export const getWatchlist = async (req, res) => {
   try {
-    const data = await Watchlist.findAll();
+    const user_id = req.user.id; 
+    const data = await Watchlist.findAll({ where: { user_id }});
     res.json(data);
   } catch (err) {
     console.error(err);
@@ -13,7 +14,8 @@ export const getWatchlist = async (req, res) => {
 export const getWatchlistById = async (req, res) => {
   try {
     const { id } = req.params;
-    const data = await Watchlist.findOne({ where: { id: id}});
+    const user_id = req.user.id; 
+    const data = await Watchlist.findOne({ where: { id: id, user_id }});
 
     if (!data) {
       return res.status(404).json({ error: `Tidak ditemukan watchlist dengan id ${id}` });

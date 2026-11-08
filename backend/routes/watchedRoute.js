@@ -4,7 +4,7 @@ import express from "express";
 
 const router = express.Router();
 
-router.get("/", getWatched);
+router.get("/", verifyToken, getWatched);
 router.post("/", verifyToken, markAsWatched);
 
 export default router;

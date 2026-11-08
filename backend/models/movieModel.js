@@ -1,7 +1,5 @@
-import { Sequelize } from "sequelize";
+import { DataTypes } from "sequelize";
 import { sequelize } from "../config/db.js";
-
-const { DataTypes } = Sequelize;
 
 const Movie = sequelize.define(
   "movies",
@@ -55,5 +53,3 @@ const Movie = sequelize.define(
 );
 
 export default Movie;
-
-await sequelize.sync();

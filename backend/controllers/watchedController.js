@@ -2,7 +2,8 @@ import Watched from "../models/watchedModel.js";
 
 export const getWatched = async (req, res) => {
   try {
-    const data = await Watched.findAll();
+    const user_id = req.user.id;
+    const data = await Watched.findAll({ where: { user_id }});
     res.json(data);
   } catch (err) {
     console.error(err);

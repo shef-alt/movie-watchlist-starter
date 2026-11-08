@@ -1,7 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/db.js";
-import Movie from "./movieModel.js";
-import User from "./userModel.js";
 
 const Watchlist = sequelize.define(
   "watchlist",
@@ -27,18 +25,4 @@ const Watchlist = sequelize.define(
   },
 );
 
-Watchlist.belongsTo(Movie, {
-    foreignKey: "movie_id",
-    targetKey: "id",
-    onDelete: "CASCADE"
-})
-
-Watchlist.belongsTo(User, {
-    foreignKey: "user_id",
-    targetKey: "id",
-    onDelete: "CASCADE"
-})
-
 export default Watchlist;
-
-await sequelize.sync();

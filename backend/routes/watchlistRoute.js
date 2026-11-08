@@ -9,8 +9,8 @@ import express from "express";
 
 const router = express.Router();
 
-router.get("/", getWatchlist);
-router.get("/:id", getWatchlistById);
+router.get("/", verifyToken, getWatchlist);
+router.get("/:id", verifyToken, getWatchlistById);
 router.post("/", verifyToken, addToWatchlist);
 router.delete("/:id", verifyToken, deleteFromWatchlist);
 
