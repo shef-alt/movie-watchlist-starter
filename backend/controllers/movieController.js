@@ -6,7 +6,9 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 export const getMovies = async (req, res) => {
   try {
     const data = await Movie.findAll();
-    res.json(data);
+    res
+      .status(200)
+      .json({ message: "Berhasil mengambil data film dari database", data });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Gagal mengambil data film dari database" });
@@ -19,10 +21,17 @@ export const getMovieById = async (req, res) => {
     const data = await Movie.findOne({ where: { id: id } });
 
     if (!data) {
-      return res.status(404).json({ error: `Movie dengan id ${id} tidak ditemukan` });
+      return res
+        .status(404)
+        .json({ error: `Movie dengan id ${id} tidak ditemukan` });
     }
 
-    res.json(data[0]);
+    res
+      .status(200)
+      .json({
+        message: `Berhasil mengambil data film id ${id} dari database`,
+        data,
+      });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Gagal mengambil data film dari database" });
@@ -32,7 +41,7 @@ export const getMovieById = async (req, res) => {
 export const recommendMovie = async (req, res) => {
   try {
     const { prompt } = req.body;
-    if (!prompt || prompt.trim() === "") {
+    if (typeof prompt !== "string" || prompt.trim() === "") {
       return res
         .status(400)
         .json({ message: "Deskripsi atau prompt wajib diisi" });
@@ -73,8 +82,15 @@ export const recommendMovie = async (req, res) => {
       },
     });
 
-    const { is_movie_request, movie_id, reasoning } =
-      response.functionCalls?.[0].args;
+    const args = response.functionCalls?.[0].args;
+
+    if (!args) {
+      return res
+        .status(502)
+        .json({ message: "AI tidak mewmberikan rekomendasi" });
+    }
+
+    const { is_movie_request, movie_id, reasoning } = args;
 
     if (!is_movie_request) {
       return res.status(400).json({

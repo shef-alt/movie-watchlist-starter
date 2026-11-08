@@ -4,7 +4,7 @@ export const getWatched = async (req, res) => {
   try {
     const user_id = req.user.id;
     const data = await Watched.findAll({ where: { user_id }});
-    res.json(data);
+    res.status(200).json({ message: "Berhasil mengambil data watched dari database", data });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Gagal mengambil data watched dari database" });
@@ -17,7 +17,7 @@ export const markAsWatched = async (req, res) => {
     const { movie_id, rating, review } = req.body;
 
     const data = await Watched.create({ movie_id, user_id, rating, review })
-    res.json(data);
+    res.status(200).json({ message: "Berhasil mengambil data watched dari database", data });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Gagal menyimpan data watched ke database" });
